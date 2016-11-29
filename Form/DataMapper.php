@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Gedmo\Translatable\Entity\Repository\TranslationRepository;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Exception;
 
 class DataMapper implements DataMapperInterface{
@@ -80,6 +81,25 @@ class DataMapper implements DataMapperInterface{
 
     }
 
+    public function add($name, $type, $options=[]) {
+        $translationsFormField = false;
+        try {
+            $translationsFormField = $this->builder->get('translations');
+        } catch (\InvalidArgumentException $e) {
+        }
+
+        if (!$translationsFormField) {
+            $translationsFormField = $this->builder->add('translations', TranslationsType::class, [
+                'mapped' => false,
+            ]);
+        }
+
+        foreach ($this->locales as $iso) {
+        }
+
+        return $this;
+    }
+
 
     /**
      * @param $name
@@ -88,10 +108,29 @@ class DataMapper implements DataMapperInterface{
      * @return DataMapper
      * @throws \Exception
      */
-    public function add($name, $type, $options=[])
+    public function add_old($name, $type, $options=[])
     {
 
         $this->property_names[] = $name;
+
+        //$translations = $this->builder->add('translations', TranslationsType::class, [
+        //    'mapped' => false,
+        //]);
+        //$translationsField = $this->builder->get('translations');
+
+        //$translationsField->add('lang_bg', TranslatableGroupType::class, [
+        //    'mapped' => false,
+        //    'lang' => 'bg',
+        //])->get('lang_bg')->add('name', TextType::class, [
+        //    'label' => 'Name',
+        //]);
+
+        //$translationsField->add('lang_en', TranslatableGroupType::class, [
+        //    'mapped' => false,
+        //    'lang' => 'en',
+        //])->get('lang_en')->add('name', TextType::class, [
+        //    'label' => 'Name',
+        //]);
 
         $field = $this->builder
             ->add($name, $type)
@@ -128,7 +167,6 @@ class DataMapper implements DataMapperInterface{
     {
 
         foreach($forms as $form){
-
             $translations = $this->getTranslations($data);
 
             if(false !== in_array($form->getName(), $this->property_names)) {

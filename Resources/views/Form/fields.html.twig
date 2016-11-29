@@ -45,3 +45,70 @@
 
 
 {% endblock %}
+{% block translatable_group_row %}
+<div>
+    {% for child in form %}
+    {{ form_row(child) }}
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block translations_row %}
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+        {% for child in form %}
+        {% set locale = child.vars.lang %}
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ locale }}" aria-expanded="true" aria-controls="collapseOne">
+                        {{ locale }}
+                    </a>
+                </h4>
+            </div>
+            <div id="{{ locale }}" class="panel-collapse {% if not loop.first %}collapse{% else %}collapse in{% endif %}" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">
+                    {{ form_row(child) }}
+                    {#
+                    {% if locale == 'bg' %}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.content) }}
+                    {% else %}
+                    {{ form_row(form['name' ~ '_en']) }}
+                    {{ form_row(form['content' ~ '_en']) }}
+                    {% endif %}
+                    #}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+
+
+
+        {#
+        {% for locale in locales %}
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ locale }}" aria-expanded="true" aria-controls="collapseOne">
+                        {{ locale }}
+                    </a>
+                </h4>
+            </div>
+            <div id="{{ locale }}" class="panel-collapse {% if not loop.first %}collapse{% else %}collapse in{% endif %}" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">
+                    {% if locale == 'bg' %}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.content) }}
+                    {% else %}
+                    {{ form_row(form['name' ~ '_en']) }}
+                    {{ form_row(form['content' ~ '_en']) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        #}
+    </div>
+{% endblock %}
