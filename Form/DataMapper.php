@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Exception;
 
-class DataMapper implements DataMapperInterface{
+class DataMapper implements DataMapperInterface {
 
 
     /**
@@ -71,8 +71,7 @@ class DataMapper implements DataMapperInterface{
         return $this->locales;
     }
 
-    public function getTranslations($entity){
-
+    public function getTranslations($entity) {
         if(!count($this->translations)){
             $this->translations = $this->repository->findTranslations($entity);
         }
@@ -81,20 +80,52 @@ class DataMapper implements DataMapperInterface{
 
     }
 
-    public function add($name, $type, $options=[]) {
-        $translationsFormField = false;
+    public function getOrCreateFormField($builder, $name, $type, $options) {
+        $field = false;
+
         try {
-            $translationsFormField = $this->builder->get('translations');
+            $field = $builder->get($name);
         } catch (\InvalidArgumentException $e) {
+            $field = $builder->add($name, $type, $options)->get($name);
         }
 
-        if (!$translationsFormField) {
-            $translationsFormField = $this->builder->add('translations', TranslationsType::class, [
-                'mapped' => false,
-            ]);
-        }
+        return $field;
+    }
+
+    public function add($name, $type, $options=[]) {
+        //$this->property_names[] = $name;
+
+        //$translationsFormField = false;
+        //try {
+        //    $translationsFormField = $this->builder->get('translations');
+        //} catch (\InvalidArgumentException $e) {
+        //}
+
+        //if (!$translationsFormField) {
+        //    $translationsFormField = $this->builder->add('translations', TranslationsType::class, [
+        //        'mapped' => false,
+        //    ]);
+        //}
+
+        $translationsFormField = $this->getOrCreateFormField($this->builder, 'translations', TranslationsType::class, [
+            //'mapped' => false,
+        ]);
 
         foreach ($this->locales as $iso) {
+            $fieldName = 'lang_' . $iso;
+
+            //$languageGroup = $this->createOrGetField($translationsFormField, 'lang_' . $iso, TranslatableGroupType::class, [
+            //    'mapped' => false,
+            //    'lang' => $iso,
+            //]);
+
+            $languageGroup = $this->getOrCreateFormField($translationsFormField, $fieldName, TranslatableGroupType::class, [
+                //'mapped' => false,
+                'lang' => $iso,
+            ]);
+
+
+            $languageGroup->add($name, $type, $options);
         }
 
         return $this;
@@ -163,34 +194,85 @@ class DataMapper implements DataMapperInterface{
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
      */
-    public function mapDataToForms($data, $forms)
-    {
+    public function mapDataToForms($data, $forms) {
+        foreach($forms as $form) {
+            //if ($form->getName() == 'translations') {
+            //    $form->setData([
+            //        'lang_bg' => [
+            //            'name' => 'asd',
+            //        ]
+            //    ]);
+            //}
 
-        foreach($forms as $form){
-            $translations = $this->getTranslations($data);
-
-            if(false !== in_array($form->getName(), $this->property_names)) {
+            if ($form->getName() == 'translations') {
+                $translations = $this->getTranslations($data);
 
                 $values = [];
-                foreach($this->getLocales() as $iso){
-
-                    if(isset($translations[$iso])){
-                        $values[$iso] =  $translations[$iso][$form->getName()];
-                    }
-
+                foreach($translations as $iso => $translatedData) {
+                    $values['lang_'.$iso] = $translatedData;
                 }
+
                 $form->setData($values);
 
-            }else{
+                //foreach($form as $formLang) {
+                //    $iso = explode('_', $formLang->getName())[1];
 
+                //    foreach($formLang as $f) {
+                //        //$data = $translations[$iso][$f->getName()];
+                //        //var_dump($f->getName());
+                //        //var_dump($data);
+                //        $f->setData('asd');
+                //    }
+
+                //    //var_dump($formLang->getName());
+
+
+                //    //$values = [];
+                //    //foreach($translations[$iso] as $fieldName => $fieldValue) {
+                //    //    $values[$fieldName] = $fieldValue;
+                //    //}
+                //    ////var_dump($iso);
+                //    ////print_R($values);
+                //    //$formLang->setData($values);
+
+                //    //var_dump($translations[$iso]);
+                //}
+
+                //print_R($values);
+                //$values['info_page']['translations']['bg']['name'] = 'asd';
+                //$values['info_page']['translations']['lang_bg']['name'] = 'asd';
+                //$values['lang_bg']['name'] = 'asd';
+            } else {
                 if(false === $form->getConfig()->getOption("mapped") || null === $form->getConfig()->getOption("mapped")){
                     continue;
                 }
 
                 $accessor = PropertyAccess::createPropertyAccessor();
                 $form->setData($accessor->getValue($data, $form->getName()));
-
             }
+
+            //if(false !== in_array($form->getName(), $this->property_names)) {
+
+            //    $values = [];
+            //    foreach($this->getLocales() as $iso){
+
+            //        if(isset($translations[$iso])){
+            //            $values[$iso] =  $translations[$iso][$form->getName()];
+            //        }
+
+            //    }
+            //    $form->setData($values);
+
+            //}else{
+
+            //    if(false === $form->getConfig()->getOption("mapped") || null === $form->getConfig()->getOption("mapped")){
+            //        continue;
+            //    }
+
+            //    $accessor = PropertyAccess::createPropertyAccessor();
+            //    $form->setData($accessor->getValue($data, $form->getName()));
+
+            //}
 
         }
 
@@ -208,36 +290,69 @@ class DataMapper implements DataMapperInterface{
     {
 
 
+        $entityInstance = $data;
+
         /**
          * @var $form FormInterface
          */
         foreach ($forms as $form) {
-
-
-            $entityInstance = $data;
-
-
-            if(false !== in_array($form->getName(), $this->property_names)) {
-
-
+            if ($form->getName() == 'translations') {
                 $translations = $form->getData();
-                foreach($this->getLocales() as $iso) {
-                    if(isset($translations[$iso])){
-                        $this->repository->translate($entityInstance, $form->getName(), $iso, $translations[$iso] );
+                //print_R($translations);
+
+                foreach($translations as $lang => $data) {
+                    $iso = explode('_', $lang)[1];
+
+                    foreach($data as $fname => $fdata) {
+                        $this->repository->translate($entityInstance, $fname, $iso, $fdata);
                     }
                 }
 
+                //print_R($translations);
+                //exit;
 
-            }else{
+                //foreach($this->locales as $iso) {
+                //    echo 'here';
+                //}
 
+                //echo 'asd';
+                //exit;
+            } else {
                 if(false === $form->getConfig()->getOption("mapped") || null === $form->getConfig()->getOption("mapped")){
                     continue;
                 }
 
                 $accessor = PropertyAccess::createPropertyAccessor();
                 $accessor->setValue($entityInstance, $form->getName(), $form->getData());
-
             }
+
+            //continue;
+
+
+            //$entityInstance = $data;
+
+
+            //if(false !== in_array($form->getName(), $this->property_names)) {
+
+
+            //    $translations = $form->getData();
+            //    foreach($this->getLocales() as $iso) {
+            //        if(isset($translations[$iso])){
+            //            $this->repository->translate($entityInstance, $form->getName(), $iso, $translations[$iso] );
+            //        }
+            //    }
+
+
+            //}else{
+
+            //    if(false === $form->getConfig()->getOption("mapped") || null === $form->getConfig()->getOption("mapped")){
+            //        continue;
+            //    }
+
+            //    $accessor = PropertyAccess::createPropertyAccessor();
+            //    $accessor->setValue($entityInstance, $form->getName(), $form->getData());
+
+            //}
 
         }
 
