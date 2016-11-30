@@ -5,7 +5,7 @@
  * Time: 21:07
  */
 
-namespace Simettric\DoctrineTranslatableFormBundle\Form;
+namespace nacholibre\DoctrineTranslatableFormBundle\Form;
 
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,4 +22,4 @@ interface DataMapperInterface extends \Symfony\Component\Form\DataMapperInterfac
 
     public function setRequiredLocale($locale);
 
-} 
+}

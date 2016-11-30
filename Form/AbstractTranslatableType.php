@@ -5,7 +5,7 @@
  * Time: 16:21
  */
 
-namespace Simettric\DoctrineTranslatableFormBundle\Form;
+namespace nacholibre\DoctrineTranslatableFormBundle\Form;
 
 use Symfony\Component\Form\Exception;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,7 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
                 translatable: true
  *
  * Class AbstractType
- * @package Simettric\DoctrineTranslatableFormBundle\Form
  */
 abstract class AbstractTranslatableType extends \Symfony\Component\Form\AbstractType {
     private $locales = [];

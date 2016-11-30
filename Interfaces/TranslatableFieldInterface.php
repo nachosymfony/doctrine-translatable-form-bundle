@@ -5,7 +5,7 @@
  * Time: 18:51
  */
 
-namespace Simettric\DoctrineTranslatableFormBundle\Interfaces;
+namespace nacholibre\DoctrineTranslatableFormBundle\Interfaces;
 
 
 interface TranslatableFieldInterface {

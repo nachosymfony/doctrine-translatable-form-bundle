@@ -1,6 +1,4 @@
 services:
-
-
-    sim_trans_form.mapper:
-        class:     Simettric\DoctrineTranslatableFormBundle\Form\DataMapper
+    nacholibre_doctrine_translatable_form_bundle.mapper:
+        class:     nacholibre\DoctrineTranslatableFormBundle\Form\DataMapper
         arguments: ["@doctrine.orm.entity_manager"]

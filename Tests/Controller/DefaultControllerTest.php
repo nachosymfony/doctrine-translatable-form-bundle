@@ -1,6 +1,6 @@
 <?php
 
-namespace Simettric\DoctrineTranslatableFormBundle\Tests\Controller;
+namespace nacholibre\DoctrineTranslatableFormBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
