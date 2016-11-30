@@ -2,7 +2,7 @@
 
 namespace nacholibre\DoctrineTranslatableFormBundle;
 
-use nacholibre\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class nacholibreDoctrineTranslatableFormBundle extends Bundle
 {
