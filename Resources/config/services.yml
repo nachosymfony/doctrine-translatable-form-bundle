@@ -1,4 +1,4 @@
 services:
     nacholibre_doctrine_translatable_form_bundle.mapper:
         class:     nacholibre\DoctrineTranslatableFormBundle\Form\DataMapper
-        arguments: ["@doctrine.orm.entity_manager"]
+        arguments: ["@doctrine.orm.entity_manager", "%doctrine_forms_fallback_locale%"]

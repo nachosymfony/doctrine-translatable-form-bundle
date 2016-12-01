@@ -18,8 +18,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Exception;
 
 class DataMapper implements DataMapperInterface {
-
-
     /**
      * @var EntityManager
      */
@@ -37,21 +35,18 @@ class DataMapper implements DataMapperInterface {
 
     private $translations=[];
 
-
     private $locales=[];
 
     private $required_locale;
 
-    private $property_names=[];
+    private $mapExistingToIso;
 
+    private $property_names = [];
 
-
-
-    public function __construct(EntityManager $entityManager){
-
+    public function __construct(EntityManager $entityManager, $defaultLocale) {
         $this->em = $entityManager;
         $this->repository = $this->em->getRepository('Gedmo\Translatable\Entity\Translation');
-
+        $this->defaultLocale = $defaultLocale;
     }
 
     public function setBuilder(FormBuilderInterface $builderInterface){
@@ -66,14 +61,40 @@ class DataMapper implements DataMapperInterface {
         $this->locales = $locales;
     }
 
+    public function setMapExistingDataTo($locale) {
+        $this->mapExistingToIso = $locale;
+    }
+
+    public function getMapExistingDataTo() {
+        return $this->mapExistingToIso;
+    }
+
     public function getLocales()
     {
         return $this->locales;
     }
 
-    public function getTranslations($entity) {
+    public function getTranslations($entity, $formChildren) {
         if(!count($this->translations)){
             $this->translations = $this->repository->findTranslations($entity);
+        }
+
+        //fallback translations
+        //if doctrine translation is added after the entity was persisted
+        //default translation is not existing
+        $defaultLocaleIso = $this->defaultLocale;
+        if (!isset($this->translations[$defaultLocaleIso])) {
+            $trans = [];
+            foreach($formChildren as $child) {
+                if ($child->getName() == 'lang_' . $defaultLocaleIso) {
+                    foreach($child as $c) {
+                        $fieldName = $c->getName();
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        $trans[$fieldName] = $accessor->getValue($entity, $fieldName);
+                    }
+                }
+            }
+            $this->translations[$defaultLocaleIso] = $trans;
         }
 
         return $this->translations;
@@ -106,6 +127,11 @@ class DataMapper implements DataMapperInterface {
         //        'mapped' => false,
         //    ]);
         //}
+
+        if (count($this->getLocales()) == 1) {
+            $this->builder->add($name, $type, $options);
+            return $this;
+        }
 
         $translationsFormField = $this->getOrCreateFormField($this->builder, 'translations', TranslationsType::class, [
             //'mapped' => false,
@@ -205,7 +231,7 @@ class DataMapper implements DataMapperInterface {
             //}
 
             if ($form->getName() == 'translations') {
-                $translations = $this->getTranslations($data);
+                $translations = $this->getTranslations($data, $form);
 
                 $values = [];
                 foreach($translations as $iso => $translatedData) {
