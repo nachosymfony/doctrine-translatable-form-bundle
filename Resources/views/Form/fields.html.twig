@@ -73,7 +73,13 @@
         {% for child in form %}
         {% set locale = child.vars.lang %}
         {% set localeData = nacholibre_get_locale(locale) %}
-        <li role="presentation" {% if loop.first %}class="active"{% endif %}><a href="#{{ locale }}" aria-controls="home" role="tab" data-toggle="tab">{{ localeData.name }} ({{ locale }})</a></li>
+        <li role="presentation" {% if loop.first %}class="active"{% endif %}>
+            <a href="#{{ locale }}" aria-controls="home" role="tab" data-toggle="tab">
+                <span style='vertical-align:middle;'>{{ localeData.name }}</span>
+                <!--({{ locale }})-->
+                <img src='{{ asset("bundles/nacholibredoctrinetranslatableform/img/flags/" ~ locale ~ ".png") }}' style='vertical-align:middle;' />
+            </a>
+        </li>
         {% endfor %}
         {#
         <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
@@ -86,7 +92,7 @@
         {% set localeData = nacholibre_get_locale(locale) %}
         <div role="tabpanel" class="tab-pane {% if loop.first %}active{% endif %}" id="{{ locale }}">
             {% for c in child %}
-            {{ form_row(c, {}) }}
+            {{ form_row(c, {label: c.vars.label ~ ' (' ~ locale ~ ')'}) }}
             {% endfor %}
         </div>
         {% endfor %}

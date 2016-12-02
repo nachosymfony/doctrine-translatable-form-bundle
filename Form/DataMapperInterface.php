@@ -10,7 +10,7 @@ namespace nacholibre\DoctrineTranslatableFormBundle\Form;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-interface DataMapperInterface extends \Symfony\Component\Form\DataMapperInterface{
+interface DataMapperInterface extends \Symfony\Component\Form\DataMapperInterface {
 
     public function setBuilder(FormBuilderInterface $builderInterface);
 
@@ -20,6 +20,6 @@ interface DataMapperInterface extends \Symfony\Component\Form\DataMapperInterfac
 
     public function getLocales();
 
-    public function setRequiredLocale($locale);
+    public function setRequiredLocales($locales);
 
 }

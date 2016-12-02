@@ -27,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 abstract class AbstractTranslatableType extends \Symfony\Component\Form\AbstractType {
     private $locales = [];
 
-    private $required_locale;
+    private $required_locales;
 
     /**
      * @var DataMapperInterface
@@ -38,8 +38,8 @@ abstract class AbstractTranslatableType extends \Symfony\Component\Form\Abstract
         $this->mapper = $dataMapper;
     }
 
-    public function setRequiredLocale($iso) {
-        $this->required_locale = $iso;
+    public function setRequiredLocales($locales) {
+        $this->required_locales = $locales;
     }
 
     public function setLocales(array $locales) {
@@ -54,18 +54,18 @@ abstract class AbstractTranslatableType extends \Symfony\Component\Form\Abstract
     protected function createTranslatableMapper(FormBuilderInterface $builderInterface, array $options){
         $this->mapper->setBuilder($builderInterface, $options);
         $this->mapper->setLocales($options["locales"]);
-        $this->mapper->setRequiredLocale($options["required_locale"]);
+        $this->mapper->setRequiredLocales($options["required_locales"]);
         $builderInterface->setDataMapper($this->mapper);
 
         return $this->mapper;
     }
 
     protected function configureTranslationOptions(OptionsResolver $resolver) {
-        $resolver->setRequired(["locales", "required_locale"]);
+        $resolver->setRequired(["locales", "required_locales"]);
 
         $data = [
             'locales'         => $this->locales?:["en"],
-            "required_locale" => $this->required_locale?:"en",
+            "required_locales" => $this->required_locales ?: ["en"],
         ];
 
 

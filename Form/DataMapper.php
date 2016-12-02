@@ -37,7 +37,7 @@ class DataMapper implements DataMapperInterface {
 
     private $locales=[];
 
-    private $required_locale;
+    private $requiredLocales = [];
 
     private $mapExistingToIso;
 
@@ -53,8 +53,8 @@ class DataMapper implements DataMapperInterface {
         $this->builder = $builderInterface;
     }
 
-    public function setRequiredLocale($locale){
-        $this->required_locale = $locale;
+    public function setRequiredLocales($locales) {
+        $this->requiredLocales = $locales;
     }
 
     public function setLocales(array $locales){
@@ -128,6 +128,14 @@ class DataMapper implements DataMapperInterface {
         //    ]);
         //}
 
+        $constraintsRequiredLocales = null;
+        if (isset($options['constraints_required_locales'])) {
+            $constraintsRequiredLocales = $options['constraints_required_locales'];
+            unset($options['constraints_required_locales']);
+        }
+
+        //print_R($options);
+
         if (count($this->getLocales()) == 1) {
             $this->builder->add($name, $type, $options);
             return $this;
@@ -137,6 +145,7 @@ class DataMapper implements DataMapperInterface {
             //'mapped' => false,
         ]);
 
+
         foreach ($this->locales as $iso) {
             $fieldName = 'lang_' . $iso;
 
@@ -145,13 +154,45 @@ class DataMapper implements DataMapperInterface {
             //    'lang' => $iso,
             //]);
 
+            $required = false;
+
+            if (in_array($iso, $this->requiredLocales)) {
+                $required = true;
+            }
+
+            $fieldOptions = $options;
+
+            $constraints = [];
+            if (isset($options['constraints'])) {
+                $constraints = $options['constraints'];
+            }
+
+            if (in_array($iso, $this->requiredLocales) && $constraintsRequiredLocales) {
+                //var_dump('has local required constraint');
+                $constraints = array_merge($constraintsRequiredLocales, $constraints);
+            }
+
+            //print_R($constraints);
+
+            $fieldOptions['constraints'] = $constraints;
+
             $languageGroup = $this->getOrCreateFormField($translationsFormField, $fieldName, TranslatableGroupType::class, [
                 //'mapped' => false,
                 'lang' => $iso,
+                'required' => $required,
             ]);
 
+            //copy variable options
+            //$ref =& $options;
+            //$newOptions = $ref;
 
-            $languageGroup->add($name, $type, $options);
+            //var_dump($fieldName . '_'.$name);
+            //print_R($constraints);
+            //print_R($options);
+            //var_dump('----------------');
+
+            $languageGroup->add($name, $type, $fieldOptions);
+            //$options['constraints'] = [];
         }
 
         return $this;
