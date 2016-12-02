@@ -54,61 +54,49 @@
 {% endblock %}
 
 {% block translations_row %}
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+<style>
+    .tab-content {
+        border: 1px solid #ccc;
+        border-top: none;
+        padding: 10px;
+        margin-bottom:15px;
+    }
+
+    .nav.nav-tabs {
+        margin-top:15px;
+    }
+</style>
+<div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
 
         {% for child in form %}
         {% set locale = child.vars.lang %}
-        <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOne">
-                <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ locale }}" aria-expanded="true" aria-controls="collapseOne">
-                        {{ locale }}
-                    </a>
-                </h4>
-            </div>
-            <div id="{{ locale }}" class="panel-collapse {% if not loop.first %}collapse{% else %}collapse in{% endif %}" role="tabpanel" aria-labelledby="headingOne">
-                <div class="panel-body">
-                    {{ form_row(child) }}
-                    {#
-                    {% if locale == 'bg' %}
-                    {{ form_row(form.name) }}
-                    {{ form_row(form.content) }}
-                    {% else %}
-                    {{ form_row(form['name' ~ '_en']) }}
-                    {{ form_row(form['content' ~ '_en']) }}
-                    {% endif %}
-                    #}
-                </div>
-            </div>
-        </div>
+        {% set localeData = nacholibre_get_locale(locale) %}
+        <li role="presentation" {% if loop.first %}class="active"{% endif %}><a href="#{{ locale }}" aria-controls="home" role="tab" data-toggle="tab">{{ localeData.name }} ({{ locale }})</a></li>
         {% endfor %}
-
-
-
-
         {#
-        {% for locale in locales %}
-        <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="headingOne">
-                <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#{{ locale }}" aria-expanded="true" aria-controls="collapseOne">
-                        {{ locale }}
-                    </a>
-                </h4>
-            </div>
-            <div id="{{ locale }}" class="panel-collapse {% if not loop.first %}collapse{% else %}collapse in{% endif %}" role="tabpanel" aria-labelledby="headingOne">
-                <div class="panel-body">
-                    {% if locale == 'bg' %}
-                    {{ form_row(form.name) }}
-                    {{ form_row(form.content) }}
-                    {% else %}
-                    {{ form_row(form['name' ~ '_en']) }}
-                    {{ form_row(form['content' ~ '_en']) }}
-                    {% endif %}
-                </div>
-            </div>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
+        #}
+    </ul>
+
+    <div class="tab-content">
+        {% for child in form %}
+        {% set locale = child.vars.lang %}
+        {% set localeData = nacholibre_get_locale(locale) %}
+        <div role="tabpanel" class="tab-pane {% if loop.first %}active{% endif %}" id="{{ locale }}">
+            {% for c in child %}
+            {{ form_row(c, {}) }}
+            {% endfor %}
         </div>
         {% endfor %}
+        {#
+        <div role="tabpanel" class="tab-pane" id="profile">...</div>
         #}
     </div>
+</div>
+
+
+
+
 {% endblock %}

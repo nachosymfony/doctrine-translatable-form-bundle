@@ -2,3 +2,15 @@ services:
     nacholibre_doctrine_translatable_form_bundle.mapper:
         class:     nacholibre\DoctrineTranslatableFormBundle\Form\DataMapper
         arguments: ["@doctrine.orm.entity_manager", "%doctrine_forms_fallback_locale%"]
+
+    nacholibre_doctrine_translatable_form_bundle.services.country_code:
+        class:     nacholibre\DoctrineTranslatableFormBundle\Services\CountryCodeService
+        arguments: []
+
+    nacholibre_doctrine_translatable_form_bundle.country_code_extension:
+        class: nacholibre\DoctrineTranslatableFormBundle\Twig\CountryCodeExtension
+        public: false
+        arguments:
+            - '@nacholibre_doctrine_translatable_form_bundle.services.country_code'
+        tags:
+            - { name: twig.extension }
