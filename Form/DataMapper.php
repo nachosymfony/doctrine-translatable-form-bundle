@@ -375,10 +375,15 @@ class DataMapper implements DataMapperInterface {
                         //    $accessor = PropertyAccess::createPropertyAccessor();
                         //    $accessor->setValue($entityInstance, $fname, $fdata);
                         //} else {
+                        //var_dump($iso);
+                        //var_dump($fname);
+                        //var_dump($fdata);
+                        //var_dump('-----------');
                             $this->repository->translate($entityInstance, $fname, $iso, $fdata);
                         //}
                     }
                 }
+                //exit;
 
                 //print_R($translations);
                 //exit;
