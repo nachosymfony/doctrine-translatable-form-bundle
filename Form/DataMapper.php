@@ -353,7 +353,10 @@ class DataMapper implements DataMapperInterface {
      *
      * @throws Exception\UnexpectedTypeException if the type of the data parameter is not supported.
      */
-    public function mapFormsToData($forms, &$data) {
+    public function mapFormsToData($forms, &$data)
+    {
+
+
         $entityInstance = $data;
 
         /**
@@ -368,33 +371,14 @@ class DataMapper implements DataMapperInterface {
                     $iso = explode('_', $lang)[1];
 
                     foreach($data as $fname => $fdata) {
-                        //if ($fname == 'slug') {
-                        //    continue;
-                        //}
-                        //if ($fname == 'name') {
-                        //    //var_dump($iso);
-                        //    //var_dump($fname);
-                        //    //var_dump($fdata);
-                        //    //var_dump('=====');
-                        //    //$entityInstance->setName($fdata);
-                        //    //$entityInstance->setTranslatableLocale($iso);
-                        //    //$this->em->persist($entityInstance);
-                        //    //$this->em->flush();
+                        //if ($iso == 'bg') {
+                        //    $accessor = PropertyAccess::createPropertyAccessor();
+                        //    $accessor->setValue($entityInstance, $fname, $fdata);
                         //} else {
-                        //    //$this->repository->translate($entityInstance, $fname, $iso, $fdata);
+                            $this->repository->translate($entityInstance, $fname, $iso, $fdata);
                         //}
-                        $this->repository->translate($entityInstance, $fname, $iso, $fdata);
-                        //if ($fname == 'name' && $iso == 'bg') {
-                        //    $entityInstance->setName($fdata);
-                        //    $entityInstance->setTranslatableLocale($iso);
-                        //    $this->em->persist($entityInstance);
-                        //    $this->em->flush();
-                        //}
-                        //var_dump($fname);
-                        //var_dump($fdata);
                     }
                 }
-                //exit;
 
                 //print_R($translations);
                 //exit;
@@ -406,7 +390,7 @@ class DataMapper implements DataMapperInterface {
                 //echo 'asd';
                 //exit;
             } else {
-                if(false === $form->getConfig()->getOption("mapped") || null === $form->getConfig()->getOption("mapped")) {
+                if(false === $form->getConfig()->getOption("mapped") || null === $form->getConfig()->getOption("mapped")){
                     continue;
                 }
 
