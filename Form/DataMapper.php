@@ -277,6 +277,7 @@ class DataMapper implements DataMapperInterface {
                 $values = [];
                 foreach($translations as $iso => $translatedData) {
                     $values['lang_'.$iso] = $translatedData;
+
                 }
 
                 $form->setData($values);
@@ -379,7 +380,9 @@ class DataMapper implements DataMapperInterface {
                         //var_dump($fname);
                         //var_dump($fdata);
                         //var_dump('-----------');
+                        if ($fdata) {
                             $this->repository->translate($entityInstance, $fname, $iso, $fdata);
+                        }
                         //}
                     }
                 }
